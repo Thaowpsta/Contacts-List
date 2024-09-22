@@ -5,22 +5,31 @@ import '../data/models/contact_model.dart';
 import '../providers/contact_provider.dart';
 
 class EditContact extends StatelessWidget {
-
-  final nameController = TextEditingController();
-  final numberController = TextEditingController();
-  final emailController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController numberController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
   final String name, email, number;
   final int? index;
-
   final bool isEditing;
 
-  EditContact({super.key, required this.isEditing, this.name = 'Name', this.email = 'Email', this.number = 'Number', this.index });
+  EditContact({
+    super.key,
+    required this.isEditing,
+    this.name = '',
+    this.email = '',
+    this.number = '',
+    this.index,
+  }) {
+    nameController.text = name;
+    numberController.text = number;
+    emailController.text = email;
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text(
@@ -35,7 +44,7 @@ class EditContact extends StatelessWidget {
             child: TextField(
               controller: nameController,
               decoration: InputDecoration(
-                labelText: name,
+                labelText: 'Name',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide: const BorderSide(
@@ -44,7 +53,6 @@ class EditContact extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
-                  // Maintain rounded corners on focus
                   borderSide: BorderSide(
                     color: Colors.lightBlue.shade800,
                     width: 2.0,
@@ -57,13 +65,15 @@ class EditContact extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
             child: TextField(
               controller: numberController,
+              keyboardType: TextInputType.phone,
               decoration: InputDecoration(
-                  labelText: number, border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Colors.black,
-                )
-              ),
+                labelText: 'Number',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.black,
+                  ),
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
@@ -78,23 +88,23 @@ class EditContact extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
             child: TextField(
               controller: emailController,
+              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                  labelText: email,
-                  border: OutlineInputBorder(
+                labelText: 'Email',
+                border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.black,
-                  )
-              ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.lightBlue.shade800,
-                      width: 2.0,
-                    ),
                   ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.lightBlue.shade800,
+                    width: 2.0,
+                  ),
+                ),
               ),
-
             ),
           ),
           const Spacer(),
@@ -105,29 +115,29 @@ class EditContact extends StatelessWidget {
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-                onPressed: (){
+              onPressed: () {
+                ContactModel contact = ContactModel(
+                  nameController.text,
+                  numberController.text,
+                  emailController.text,
+                );
 
-              ContactModel contact = ContactModel(
-                name,
-                number,
-                email,
-              );
+                if (isEditing && index != null) {
+                  Provider.of<ContactProvider>(context, listen: false)
+                      .updateContact(index!, contact);
+                } else {
+                  Provider.of<ContactProvider>(context, listen: false)
+                      .addContact(contact);
+                }
 
-              if (isEditing && index != null) {
-                Provider.of<ContactProvider>(context, listen: false)
-                    .updateContact(index!, contact);
-              } else {
-                Provider.of<ContactProvider>(context, listen: false)
-                    .addContact(contact);
-              }
-
-              Navigator.pop(context);
-            },
-                child: const Text('Save Contact')),
-          )
+                Navigator.pop(context);
+              },
+              child: const Text('Save Contact'),
+            ),
+          ),
         ],
       ),
     );
